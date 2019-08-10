@@ -1,7 +1,8 @@
-# Systems Programming Examples
+# Encyclopedia of Common Systems Programming Optimizations & Tricks
 
-A list of some common optimization techniques for doing "systems programming" to
-make your code run faster, more efficient, and just plain better.
+A listing of some common optimization techniques and tricks for doing "systems
+programming" to make your code run faster, be more efficient, and look cooler to
+other people.
 
 
 ## Cache Lines & False Sharing
