@@ -7,6 +7,7 @@ make your code run faster, more efficient, and just plain better.
 ## Cache Lines & False Sharing
 
 
+```
 Executing tests from //examples:cache-lines
 -----------------------------------------------------------------------------
 2019-08-10 06:00:55
@@ -25,3 +26,4 @@ BM_CountersCacheLineFalseSharing/4           5564662 ns      49653 ns       1000
 BM_CacheLineAwareCountersNoFalseSharing/2     462555 ns      31671 ns      10000
 BM_CacheLineAwareCountersNoFalseSharing/3     683453 ns      42251 ns      10000
 BM_CacheLineAwareCountersNoFalseSharing/4     865445 ns      40905 ns      10000
+```
