@@ -28,8 +28,9 @@ are, big air quotes incoming, "falsely sharing" a cache line for no good reason.
 
 The solution is to force these counters onto separate cache lines, which you can
 do in C/C++ by forcing the alignment of the members of a struct/class. In
-[examples/cache-lines.cc](examples/cache-lines.cc) we use absl'
-`ABSL_CACHELINE_ALIGNED` macro to achieve this.
+[examples/cache-lines.cc](examples/cache-lines.cc) we use absl's
+[`ABSL_CACHELINE_ALIGNED`](https://github.com/abseil/abseil-cpp/blob/fa00c321073c7ea40a4fc3dfc8a06309eae3d025/absl/base/optimization.h#L99-L148)
+macro to achieve this.
 
 
 ```
