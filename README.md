@@ -7,6 +7,30 @@ other people.
 
 ## Cache Lines & False Sharing
 
+False sharing is a fairly well-understood problem in optimizing multi-threaded
+code on modern SMP systems. The problem has been
+[written](https://software.intel.com/en-us/articles/avoiding-and-identifying-false-sharing-among-threads)
+[about](https://mechanical-sympathy.blogspot.com/2011/07/false-sharing.html)
+[fairly](https://dzone.com/articles/false-sharing)
+[extensively](https://herbsutter.com/2009/05/15/effective-concurrency-eliminate-false-sharing/),
+but the idea is that memory on a machine is broken up into the smallest atomic
+unit, called a "cache line" or "cache-line". As of 2019 they're usually
+somewhere around 32-256 bytes, with 64 bytes being the most common. To support
+multiple cores on a single machine reading from the same memory in an atomic
+way, such as with check-and-set, only one core on a machine can have exclusive
+access to a single cache line. The problem of false sharing is when you
+accidentally put two atomic counters in the same cache line, where now atomic
+accesses to one counter adversely effects atomic accesses to the other counter.
+
+The name "false sharing" comes from this adverse effect, even though these two
+counters shouldn't be affecting one another from a correctness standpoint. They
+are, big air quotes incoming, "falsely sharing" a cache line for no good reason.
+
+The solution is to force these counters onto separate cache lines, which you can
+do in C/C++ by forcing the alignment of the members of a struct/class. In
+[examples/cache-lines.cc](examples/cache-lines.cc) we use absl'
+`ABSL_CACHELINE_ALIGNED` macro to achieve this.
+
 
 ```
 Executing tests from //examples:cache-lines
