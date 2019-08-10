@@ -9,7 +9,7 @@ make your code run faster, more efficient, and just plain better.
 
 Executing tests from //examples:cache-lines
 -----------------------------------------------------------------------------
-2019-08-10 05:54:30
+2019-08-10 06:00:55
 Run on (4 X 2800 MHz CPU s)
 CPU Caches:
   L1 Data 32K (x2)
@@ -19,9 +19,9 @@ CPU Caches:
 ---------------------------------------------------------------------------------
 Benchmark                                          Time           CPU Iterations
 ---------------------------------------------------------------------------------
-BM_CountersCacheLineFalseSharing/2           2929057 ns      37267 ns       1000
-BM_CountersCacheLineFalseSharing/3           4327534 ns      48526 ns       1000
-BM_CountersCacheLineFalseSharing/4           5808361 ns      48766 ns       1000
-BM_CountersCacheLineAwareNoFalseSharing/2     461375 ns      31524 ns      10000
-BM_CountersCacheLineAwareNoFalseSharing/3     674816 ns      42130 ns      10000
-BM_CountersCacheLineAwareNoFalseSharing/4     861697 ns      40315 ns      10000
+BM_CountersCacheLineFalseSharing/2           2929666 ns      38000 ns       1000
+BM_CountersCacheLineFalseSharing/3           4370282 ns      46281 ns       1000
+BM_CountersCacheLineFalseSharing/4           5564662 ns      49653 ns       1000
+BM_CacheLineAwareCountersNoFalseSharing/2     462555 ns      31671 ns      10000
+BM_CacheLineAwareCountersNoFalseSharing/3     683453 ns      42251 ns      10000
+BM_CacheLineAwareCountersNoFalseSharing/4     865445 ns      40905 ns      10000

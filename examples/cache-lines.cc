@@ -82,7 +82,7 @@ void BM_CountersCacheLineFalseSharing(benchmark::State& state) {
   }
 }
 
-void BM_CountersCacheLineAwareNoFalseSharing(benchmark::State& state) {
+void BM_CacheLineAwareCountersNoFalseSharing(benchmark::State& state) {
   for (auto _ : state) {
     CounterBench<CacheLineAwareCounters>(state);
   }
@@ -91,7 +91,7 @@ void BM_CountersCacheLineAwareNoFalseSharing(benchmark::State& state) {
 // Try running with 2, 3, and then 4 threads all bumping counters in this struct
 // which will all usually share a cache line.
 BENCHMARK(BM_CountersCacheLineFalseSharing)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(BM_CountersCacheLineAwareNoFalseSharing)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BM_CacheLineAwareCountersNoFalseSharing)->Arg(2)->Arg(3)->Arg(4);
 
 }  // namespace
 }  // namespace sysprog
