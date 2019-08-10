@@ -1,15 +1,12 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Not gonna lie, just stole this from the quick start, not sure how else you're
-# supposed to "live at head" besides having the Abseil repo checked out next
-# door.
-local_repository(
-  # Name of the Abseil repository. This name is defined within Abseil's
-  # WORKSPACE file, in its `workspace()` metadata
-  name = "com_google_absl",
-
-  # NOTE: Bazel paths must be absolute paths. E.g., you can't use ~/Source
-  path = "/Users/ptc/dev/abseil-cpp",
+# Abseil archive, presumbly I should be "living at head" even more and update
+# this often.
+http_archive(
+    name = "com_google_absl",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/4ef574064e75b86f115549e9eb4c7e806781b3ab.zip"],
+    strip_prefix = "abseil-cpp-4ef574064e75b86f115549e9eb4c7e806781b3ab",
+    sha256 = "13d7a01eb5452f268b0b2f9d35bf8a51b194cf9d4a5c3c32c0701141bf56bd76",
 )
 
 # Bazel toolchains
