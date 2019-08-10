@@ -1,4 +1,3 @@
-WORKSPACE
 # gitignore template for Bazel build system
 # website: https://bazel.build/
 
