@@ -13,5 +13,7 @@ cc_test(
     deps = [
       "@com_github_google_benchmark//:benchmark_main",
       "@com_google_absl//absl/synchronization",
+      "@com_github_google_glog//:glog",
+      "@com_github_google_googletest//:gtest_main",
     ],
 )

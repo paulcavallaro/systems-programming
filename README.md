@@ -32,11 +32,38 @@ do in C/C++ by forcing the alignment of the members of a struct/class. In
 [`ABSL_CACHELINE_ALIGNED`](https://github.com/abseil/abseil-cpp/blob/fa00c321073c7ea40a4fc3dfc8a06309eae3d025/absl/base/optimization.h#L99-L148)
 macro to achieve this.
 
+To show the effect in practice, we benchmark two different structs of
+std::atomic<int64> counters, `NormalCounters` and `CacheLineAwareCounters`.
 
 ```
-Executing tests from //examples:cache-lines
------------------------------------------------------------------------------
-2019-08-10 06:00:55
+// NormalCounters is straight forward naive implementation of a struct of
+// counters.
+struct ABSL_CACHELINE_ALIGNED NormalCounters {
+  std::atomic<int64> success{0};
+  std::atomic<int64> failure{0};
+  std::atomic<int64> okay{0};
+  std::atomic<int64> meh{0};
+};
+
+// CacheLineAwareCounters forces each counter onto a separate cache line to
+// avoid any false sharing between the counters.
+struct ABSL_CACHELINE_ALIGNED CacheLineAwareCounters {
+  ABSL_CACHELINE_ALIGNED std::atomic<int64> success{0};
+  ABSL_CACHELINE_ALIGNED std::atomic<int64> failure{0};
+  ABSL_CACHELINE_ALIGNED std::atomic<int64> okay{0};
+  ABSL_CACHELINE_ALIGNED std::atomic<int64> meh{0};
+};
+```
+
+The benchmark uses either 2, 3, or 4 threads, each bumping a separate atomic
+counter 64K times. Here are the results on a 2013 MacBook Pro:
+
+```
+$ bazel run -c opt //examples:cache-lines
+Cache Line Size: 64
+sizeof(NormalCounters) = 64
+sizeof(CacheLineAwareCounters) = 256
+2019-08-11 13:14:46
 Run on (4 X 2800 MHz CPU s)
 CPU Caches:
   L1 Data 32K (x2)
@@ -46,10 +73,16 @@ CPU Caches:
 ---------------------------------------------------------------------------------
 Benchmark                                          Time           CPU Iterations
 ---------------------------------------------------------------------------------
-BM_CountersCacheLineFalseSharing/2           2929666 ns      38000 ns       1000
-BM_CountersCacheLineFalseSharing/3           4370282 ns      46281 ns       1000
-BM_CountersCacheLineFalseSharing/4           5564662 ns      49653 ns       1000
-BM_CacheLineAwareCountersNoFalseSharing/2     462555 ns      31671 ns      10000
-BM_CacheLineAwareCountersNoFalseSharing/3     683453 ns      42251 ns      10000
-BM_CacheLineAwareCountersNoFalseSharing/4     865445 ns      40905 ns      10000
+BM_CountersCacheLineFalseSharing/2           2993777 ns      36418 ns       1000
+BM_CountersCacheLineFalseSharing/3           4366733 ns      44498 ns       1000
+BM_CountersCacheLineFalseSharing/4           6110684 ns      44818 ns       1000
+BM_CacheLineAwareCountersNoFalseSharing/2     453697 ns      31485 ns      10000
+BM_CacheLineAwareCountersNoFalseSharing/3     668418 ns      43824 ns      10000
+BM_CacheLineAwareCountersNoFalseSharing/4     845970 ns      38363 ns      10000
 ```
+
+We can see `CPU` doesn't change much, since it's only measuring the main
+thread's CPU usage, but `Time` clearly is much worse when we have false sharing
+with `NormalCounters` and gets worse as we add more threads contending. It's
+also interesting to note that `CacheLineAwareCounters` also sees degrading
+performance with more threads, instead of scaling out perfectly.
