@@ -1,4 +1,4 @@
-# Encyclopedia of Common Systems Programming Optimizations & Tricks
+# Common Systems Programming Optimizations & Tricks
 
 A listing of some common optimization techniques and tricks for doing "systems
 programming" to make your code run faster, be more efficient, and look cooler to
