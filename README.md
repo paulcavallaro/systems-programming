@@ -86,3 +86,13 @@ thread's CPU usage, but `Time` clearly is much worse when we have false sharing
 with `NormalCounters` and gets worse as we add more threads contending. It's
 also interesting to note that `CacheLineAwareCounters` also sees degrading
 performance with more threads, instead of scaling out perfectly.
+
+
+## The Magic Power of 2
+
+In current hardware, division and modulo, is one of the most expensive
+operations, where expensive here means "longest
+latency". [Agner Fog's listing of instruction latencies](https://www.agner.org/optimize/instruction_tables.pdf)
+lists Intel Skylake's `DIV` instruction operating on two 64 bit registers having
+a latency of 35-88 cycles, compared to `ADD` instruction operating on the same
+two 64 bit registers having a latency of 1 cycle.

@@ -1,9 +1,8 @@
+#include <iostream>
 #include <thread>
 
 #include "absl/synchronization/notification.h"
 #include "benchmark/benchmark.h"
-#include "glog/logging.h"
-#include "gtest/gtest.h"
 
 using int64 = int64_t;
 
@@ -24,8 +23,6 @@ struct ABSL_CACHELINE_ALIGNED CacheLineAwareCounters {
   ABSL_CACHELINE_ALIGNED std::atomic<int64> okay{0};
   ABSL_CACHELINE_ALIGNED std::atomic<int64> meh{0};
 };
-
-void PrintSize() {}
 
 namespace sysprog {
 namespace {
@@ -99,14 +96,12 @@ void BM_CacheLineAwareCountersNoFalseSharing(benchmark::State& state) {
 // Try running with 2, 3, and then 4 threads all bumping counters in this struct
 // which will all usually share a cache line.
 BENCHMARK(BM_CountersCacheLineFalseSharing)->Arg(2)->Arg(3)->Arg(4);
-
 BENCHMARK(BM_CacheLineAwareCountersNoFalseSharing)->Arg(2)->Arg(3)->Arg(4);
 
 }  // namespace
 }  // namespace sysprog
 
 int main(int argc, char** argv) {
-  google::InitGoogleLogging(argv[0]);
   std::cerr << "Cache Line Size: " << ABSL_CACHELINE_SIZE << std::endl;
   std::cerr << "sizeof(NormalCounters) = " << sizeof(NormalCounters)
             << std::endl;

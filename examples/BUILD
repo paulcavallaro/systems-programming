@@ -13,7 +13,15 @@ cc_test(
     deps = [
       "@com_github_google_benchmark//:benchmark_main",
       "@com_google_absl//absl/synchronization",
-      "@com_github_google_glog//:glog",
-      "@com_github_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "power-of-two",
+    srcs = ["power-of-two.cc"],
+    tags = ["benchmark"],
+    deps = [
+      "@com_github_google_benchmark//:benchmark_main",
+      "@com_google_absl//absl/random",
     ],
 )
