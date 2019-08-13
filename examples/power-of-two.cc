@@ -26,32 +26,37 @@ uint64 randomPowerOfTwo() {
   return uint64{1} << flsll(n);
 }
 
+uint64 getNum() {
+  static auto gen = absl::BitGen();
+  return gen();
+}
+
 void BM_Mod(benchmark::State& state) {
-  auto gen = absl::BitGen();
-  uint64 numerator = gen();
-  const uint64 divisor = randomNonPowerOfTwo();
-  benchmark::DoNotOptimize(numerator);
+  uint64 num = getNum();
+  uint64 divisor = randomNonPowerOfTwo();
   for (auto _ : state) {
     for (uint64 i = 0; i < kNumIters; i++) {
-      benchmark::DoNotOptimize(numerator % divisor);
+      uint64 res = num % divisor;
+      benchmark::DoNotOptimize(res);
     }
   }
+  benchmark::DoNotOptimize(num);
 }
 
 void BM_BitMask(benchmark::State& state) {
-  uint64 num = absl::BitGen()();
-  const uint64 divisor = randomPowerOfTwo();
-  const uint64 mask = divisor & (divisor - 1);
-  benchmark::DoNotOptimize(num);
+  uint64 num = getNum();
+  uint64 divisor = randomPowerOfTwo();
+  uint64 mask = divisor & (divisor - 1);
   for (auto _ : state) {
     for (uint64 i = 0; i < kNumIters; i++) {
-      benchmark::DoNotOptimize(num & mask);
+      uint64 res = num & mask;
+      benchmark::DoNotOptimize(res);
     }
   }
 }
 
 void BM_RightShiftBy1(benchmark::State& state) {
-  uint64 num = absl::BitGen()();
+  uint64 num = getNum();
   benchmark::DoNotOptimize(num);
   for (auto _ : state) {
     for (uint64 i = 0; i < kNumIters; i++) {
@@ -70,12 +75,21 @@ void BM_DivideBy2(benchmark::State& state) {
   }
 }
 
-
+void BM_DivideBy3(benchmark::State& state) {
+  uint64 num = absl::BitGen()();
+  benchmark::DoNotOptimize(num);
+  for (auto _ : state) {
+    for (uint64 i = 0; i < kNumIters; i++) {
+      benchmark::DoNotOptimize(num / 3);
+    }
+  }
+}
 
 BENCHMARK(BM_Mod);
 BENCHMARK(BM_BitMask);
 BENCHMARK(BM_RightShiftBy1);
 BENCHMARK(BM_DivideBy2);
+BENCHMARK(BM_DivideBy3);
 
 }  // namespace
 }  // namespace sysprog
