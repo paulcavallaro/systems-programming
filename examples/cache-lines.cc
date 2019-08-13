@@ -49,54 +49,46 @@ static_assert(
     "to aligning members to different cache lines -- otherwise benchmarks will "
     "not show the difference in performance.");
 
-void BumpCounter(absl::Notification* startblock, std::atomic<int64>* counter,
-                 int64 count) {
-  startblock->WaitForNotification();
-  for (int64 i = 0; i < count; i++) {
-    (*counter)++;
-  }
-}
-
-void waitThreads(std::vector<std::thread>& threads) {
-  for (auto& t : threads) {
-    t.join();
-  }
-}
-
 constexpr int64 kNumIncrements = int64{1} << 16;
 
-template <typename CounterT>
-void CounterBench(benchmark::State& state) {
-  state.PauseTiming();
-  CounterT counters;
-  absl::Notification startblock;
-  std::vector<std::thread> threads;
-  for (int i = 0; i < state.range(0); i++) {
-    threads.emplace_back(BumpCounter, &startblock, getCounter(counters, i),
-                         kNumIncrements);
-  }
-  startblock.Notify();
-  state.ResumeTiming();
-  waitThreads(threads);
-  benchmark::DoNotOptimize(counters);
-}
-
 void BM_CountersCacheLineFalseSharing(benchmark::State& state) {
+  // Make the counters static so that each thread will use the same counters.
+  static NormalCounters counters;
+  std::atomic<int64>* counter = getCounter(counters, state.thread_index);
+  *counter = 0;
   for (auto _ : state) {
-    CounterBench<NormalCounters>(state);
+    for (int64 i = 0; i < kNumIncrements; i++) {
+      (*counter)++;
+    }
   }
+  benchmark::DoNotOptimize(*counter);
 }
 
 void BM_CacheLineAwareCountersNoFalseSharing(benchmark::State& state) {
+  // Make the counters static so that each thread will use the same counters.
+  static CacheLineAwareCounters counters;
+  std::atomic<int64>* counter = getCounter(counters, state.thread_index);
+  *counter = 0;
   for (auto _ : state) {
-    CounterBench<CacheLineAwareCounters>(state);
+    for (int64 i = 0; i < kNumIncrements; i++) {
+      (*counter)++;
+    }
   }
+  benchmark::DoNotOptimize(*counter);
 }
 
-// Try running with 2, 3, and then 4 threads all bumping counters in this struct
-// which will all usually share a cache line.
-BENCHMARK(BM_CountersCacheLineFalseSharing)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(BM_CacheLineAwareCountersNoFalseSharing)->Arg(2)->Arg(3)->Arg(4);
+// Try running with 1, 2, 3, and then 4 threads all bumping separate counters in
+// the given counters struct
+BENCHMARK(BM_CountersCacheLineFalseSharing)
+    ->Threads(1)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4);
+BENCHMARK(BM_CacheLineAwareCountersNoFalseSharing)
+    ->Threads(1)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4);
 
 }  // namespace
 }  // namespace sysprog
