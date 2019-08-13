@@ -51,7 +51,7 @@ static_assert(
 
 constexpr int64 kNumIncrements = int64{1} << 16;
 
-void BM_CountersCacheLineFalseSharing(benchmark::State& state) {
+void BM_NormalCounters(benchmark::State& state) {
   // Make the counters static so that each thread will use the same counters.
   static NormalCounters counters;
   std::atomic<int64>* counter = getCounter(counters, state.thread_index);
@@ -64,7 +64,7 @@ void BM_CountersCacheLineFalseSharing(benchmark::State& state) {
   benchmark::DoNotOptimize(*counter);
 }
 
-void BM_CacheLineAwareCountersNoFalseSharing(benchmark::State& state) {
+void BM_CacheLineAwareCounters(benchmark::State& state) {
   // Make the counters static so that each thread will use the same counters.
   static CacheLineAwareCounters counters;
   std::atomic<int64>* counter = getCounter(counters, state.thread_index);
@@ -79,12 +79,8 @@ void BM_CacheLineAwareCountersNoFalseSharing(benchmark::State& state) {
 
 // Try running with 1, 2, 3, and then 4 threads all bumping separate counters in
 // the given counters struct
-BENCHMARK(BM_CountersCacheLineFalseSharing)
-    ->Threads(1)
-    ->Threads(2)
-    ->Threads(3)
-    ->Threads(4);
-BENCHMARK(BM_CacheLineAwareCountersNoFalseSharing)
+BENCHMARK(BM_NormalCounters)->Threads(1)->Threads(2)->Threads(3)->Threads(4);
+BENCHMARK(BM_CacheLineAwareCounters)
     ->Threads(1)
     ->Threads(2)
     ->Threads(3)
