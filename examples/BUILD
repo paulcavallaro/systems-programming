@@ -25,3 +25,14 @@ cc_test(
       "@com_google_absl//absl/random",
     ],
 )
+
+cc_test(
+    name = "pointer-tagging",
+    srcs = ["pointer-tagging.cc"],
+    tags = ["benchmark"],
+    deps = [
+      "@com_github_google_benchmark//:benchmark_main",
+      "@com_google_absl//absl/memory",
+      "@com_google_googletest//:gtest_main",
+    ],
+)
