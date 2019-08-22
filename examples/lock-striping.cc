@@ -26,24 +26,24 @@ class ThreadSafeHashSet {
   absl::flat_hash_set<uint64> hash_set_;
 };
 
-template <size_t kNumLocks>
+template <size_t kNumChunks>
 class LockStripedHashSet {
  public:
   void Insert(uint64 i) {
-    const size_t idx = i % kNumLocks;
+    const size_t idx = i % kNumChunks;
     absl::MutexLock lock(&mu_[idx]);
     hash_set_[idx].insert(i);
   }
 
   bool Contains(uint64 i) {
-    const size_t idx = i % kNumLocks;
+    const size_t idx = i % kNumChunks;
     absl::MutexLock lock(&mu_[idx]);
     return hash_set_[idx].contains(i);
   }
 
  private:
-  std::array<absl::Mutex, kNumLocks> mu_;
-  std::array<absl::flat_hash_set<uint64>, kNumLocks> hash_set_;
+  std::array<absl::Mutex, kNumChunks> mu_;
+  std::array<absl::flat_hash_set<uint64>, kNumChunks> hash_set_;
 };
 
 constexpr uint64 kNumIters = 1 << 20;
@@ -63,7 +63,7 @@ void BM_SingleLock(benchmark::State& state) {
   benchmark::DoNotOptimize(hash_set);
 }
 
-void BM_LockStriping_4(benchmark::State& state) {
+void BM_LockStriping_4_Chunks(benchmark::State& state) {
   // Make static so that each thread will use the same object.
   static LockStripedHashSet<4> hash_set;
 
@@ -78,7 +78,7 @@ void BM_LockStriping_4(benchmark::State& state) {
   benchmark::DoNotOptimize(hash_set);
 }
 
-void BM_LockStriping_8(benchmark::State& state) {
+void BM_LockStriping_8_Chunks(benchmark::State& state) {
   // Make static so that each thread will use the same object.
   static LockStripedHashSet<8> hash_set;
 
@@ -98,17 +98,20 @@ BENCHMARK(BM_SingleLock)
     ->Threads(1)
     ->Threads(16)
     ->Threads(64)
-    ->Threads(128);
-BENCHMARK(BM_LockStriping_4)
+    ->Threads(128)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_LockStriping_4_Chunks)
     ->Threads(1)
     ->Threads(16)
     ->Threads(64)
-    ->Threads(128);
-BENCHMARK(BM_LockStriping_8)
+    ->Threads(128)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_LockStriping_8_Chunks)
     ->Threads(1)
     ->Threads(16)
     ->Threads(64)
-    ->Threads(128);
+    ->Threads(128)
+    ->Unit(benchmark::kMillisecond);
 
 }  // namespace
 }  // namespace sysprog
