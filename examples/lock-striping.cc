@@ -56,8 +56,17 @@ void BM_SingleLock(benchmark::State& state) {
     for (uint64 i = 0; i < kNumIters; i++) {
       hash_set.Insert(i);
     }
+  }
+  benchmark::DoNotOptimize(hash_set);
+}
+
+void BM_LockStriping_2_Chunks(benchmark::State& state) {
+  // Make static so that each thread will use the same object.
+  static LockStripedHashSet<2> hash_set;
+
+  for (auto _ : state) {
     for (uint64 i = 0; i < kNumIters; i++) {
-      benchmark::DoNotOptimize(hash_set.Contains(i));
+      hash_set.Insert(i);
     }
   }
   benchmark::DoNotOptimize(hash_set);
@@ -71,9 +80,6 @@ void BM_LockStriping_4_Chunks(benchmark::State& state) {
     for (uint64 i = 0; i < kNumIters; i++) {
       hash_set.Insert(i);
     }
-    for (uint64 i = 0; i < kNumIters; i++) {
-      benchmark::DoNotOptimize(hash_set.Contains(i));
-    }
   }
   benchmark::DoNotOptimize(hash_set);
 }
@@ -86,9 +92,6 @@ void BM_LockStriping_8_Chunks(benchmark::State& state) {
     for (uint64 i = 0; i < kNumIters; i++) {
       hash_set.Insert(i);
     }
-    for (uint64 i = 0; i < kNumIters; i++) {
-      benchmark::DoNotOptimize(hash_set.Contains(i));
-    }
   }
   benchmark::DoNotOptimize(hash_set);
 }
@@ -96,21 +99,27 @@ void BM_LockStriping_8_Chunks(benchmark::State& state) {
 // Try running with differing number of threads to show contention interference.
 BENCHMARK(BM_SingleLock)
     ->Threads(1)
-    ->Threads(16)
-    ->Threads(64)
-    ->Threads(128)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_LockStriping_2_Chunks)
+    ->Threads(1)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4)
     ->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_LockStriping_4_Chunks)
     ->Threads(1)
-    ->Threads(16)
-    ->Threads(64)
-    ->Threads(128)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4)
     ->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_LockStriping_8_Chunks)
     ->Threads(1)
-    ->Threads(16)
-    ->Threads(64)
-    ->Threads(128)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4)
     ->Unit(benchmark::kMillisecond);
 
 }  // namespace
