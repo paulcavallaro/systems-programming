@@ -79,12 +79,18 @@ void BM_CacheLineAwareCounters(benchmark::State& state) {
 
 // Try running with 1, 2, 3, and then 4 threads all bumping separate counters in
 // the given counters struct
-BENCHMARK(BM_NormalCounters)->Threads(1)->Threads(2)->Threads(3)->Threads(4);
+BENCHMARK(BM_NormalCounters)
+    ->Threads(1)
+    ->Threads(2)
+    ->Threads(3)
+    ->Threads(4)
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK(BM_CacheLineAwareCounters)
     ->Threads(1)
     ->Threads(2)
     ->Threads(3)
-    ->Threads(4);
+    ->Threads(4)
+    ->Unit(benchmark::kMicrosecond);
 
 }  // namespace
 }  // namespace sysprog

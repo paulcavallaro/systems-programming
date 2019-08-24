@@ -85,11 +85,11 @@ void BM_DivideBy3(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_Mod);
-BENCHMARK(BM_BitMask);
-BENCHMARK(BM_RightShiftBy1);
-BENCHMARK(BM_DivideBy2);
-BENCHMARK(BM_DivideBy3);
+BENCHMARK(BM_Mod)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_BitMask)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_RightShiftBy1)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_DivideBy2)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_DivideBy3)->Unit(benchmark::kMicrosecond);
 
 }  // namespace
 }  // namespace sysprog
