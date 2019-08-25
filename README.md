@@ -60,7 +60,7 @@ BM_CacheLineAwareCounters/threads:3        208 us        581 us       1152
 BM_CacheLineAwareCounters/threads:4        193 us        721 us       1008
 ```
 
-![Graph of CPU Time vs. # of Threads](/images/sysprog-false-sharing.png)
+![Graph of CPU Time vs. # of Threads](/graphs/sysprog-false-sharing.png)
 
 ## The Magic Power of 2
 
@@ -135,4 +135,4 @@ BM_LockStriping_8_Chunks/threads:4         60 ms        200 ms          4
 
 Graph:
 
-![Graph of CPU Time vs. # of Threads](/images/sysprog-lock-striping.png)
+![Graph of CPU Time vs. # of Threads](/graphs/sysprog-lock-striping.png)
