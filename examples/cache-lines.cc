@@ -8,6 +8,10 @@ using int64 = int64_t;
 
 // NormalCounters is straight forward naive implementation of a struct of
 // counters.
+// Note: We also use ABSL_CACHELINE_ALIGNED on the NormalCounters struct, but
+// not its members, so that the entire struct will be aligned to a cache line.
+// Otherwise the struct might be placed towards the end of a cache line,
+// accidentally straddling two cache lines, thereby improving its performance.
 struct ABSL_CACHELINE_ALIGNED NormalCounters {
   std::atomic<int64> success{0};
   std::atomic<int64> failure{0};
@@ -17,6 +21,9 @@ struct ABSL_CACHELINE_ALIGNED NormalCounters {
 
 // CacheLineAwareCounters forces each counter onto a separate cache line to
 // avoid any false sharing between the counters.
+// Note: We must use ABSL_CACHELINE_ALIGNED for each member, since we want to
+// pad every single counter so it will be forced onto its own separate cache
+// line.
 struct ABSL_CACHELINE_ALIGNED CacheLineAwareCounters {
   ABSL_CACHELINE_ALIGNED std::atomic<int64> success{0};
   ABSL_CACHELINE_ALIGNED std::atomic<int64> failure{0};
