@@ -60,6 +60,8 @@ BM_CacheLineAwareCounters/threads:3        208 us        581 us       1152
 BM_CacheLineAwareCounters/threads:4        193 us        721 us       1008
 ```
 
+![Graph of CPU Time vs. # of Threads](/images/sysprog-false-sharing.png)
+
 ## The Magic Power of 2
 
 In current hardware, division and modulo, is one of the most expensive
@@ -130,3 +132,7 @@ BM_LockStriping_8_Chunks/threads:2         74 ms        143 ms          4
 BM_LockStriping_8_Chunks/threads:3         71 ms        198 ms          3
 BM_LockStriping_8_Chunks/threads:4         60 ms        200 ms          4
 ```
+
+Graph:
+
+![Graph of CPU Time vs. # of Threads](/images/sysprog-lock-striping.png)
