@@ -78,7 +78,7 @@ To show how much faster using a bitmask vs. using vision, we measure executing
 $ bazel run -c opt //examples:power-of-two
 Executing tests from //examples:power-of-two
 -----------------------------------------------------------------------------
-2019-08-13 02:24:03
+2019-08-25 20:17:22
 Run on (4 X 2800 MHz CPU s)
 CPU Caches:
   L1 Data 32K (x2)
@@ -88,8 +88,12 @@ CPU Caches:
 --------------------------------------------------------
 Benchmark                 Time           CPU Iterations
 --------------------------------------------------------
-BM_Mod                 9261 us       9234 us         75
-BM_BitMask              325 us        324 us       1984
+BM_Mod                 9347 us       9298 us         74
+BM_BitMask              331 us        329 us       2123
+BM_RightShift           338 us        328 us       2089
+BM_RightShiftBy1        337 us        331 us       2132
+BM_DivideBy2            363 us        341 us       2111
+BM_DivideBy3            662 us        650 us       1055
 ```
 
 ## Lock Striping
