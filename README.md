@@ -47,17 +47,17 @@ CPU Caches:
   L1 Instruction 32K (x2)
   L2 Unified 262K (x2)
   L3 Unified 4194K (x1)
------------------------------------------------------------------------------------------
-Benchmark                                                  Time           CPU Iterations
------------------------------------------------------------------------------------------
-BM_CountersCacheLineFalseSharing/threads:1            385352 ns     382320 ns       1822
-BM_CountersCacheLineFalseSharing/threads:2           1511585 ns    3017959 ns        292
-BM_CountersCacheLineFalseSharing/threads:3           1542650 ns    4428203 ns        231
-BM_CountersCacheLineFalseSharing/threads:4           1470036 ns    5643076 ns        144
-BM_CacheLineAwareCountersNoFalseSharing/threads:1     387208 ns     382898 ns       1818
-BM_CacheLineAwareCountersNoFalseSharing/threads:2     198721 ns     396481 ns       1508
-BM_CacheLineAwareCountersNoFalseSharing/threads:3     220657 ns     578803 ns       1155
-BM_CacheLineAwareCountersNoFalseSharing/threads:4     192835 ns     755800 ns       1048
+---------------------------------------------------------------------------
+Benchmark                                    Time           CPU Iterations
+---------------------------------------------------------------------------
+BM_NormalCounters/threads:1                389 us        387 us       1812
+BM_NormalCounters/threads:2               1264 us       2517 us        234
+BM_NormalCounters/threads:3               1286 us       3718 us        225
+BM_NormalCounters/threads:4               1073 us       3660 us        204
+BM_CacheLineAwareCounters/threads:1        386 us        385 us       1799
+BM_CacheLineAwareCounters/threads:2        200 us        400 us       1658
+BM_CacheLineAwareCounters/threads:3        208 us        581 us       1152
+BM_CacheLineAwareCounters/threads:4        193 us        721 us       1008
 ```
 
 ## The Magic Power of 2
@@ -68,3 +68,65 @@ latency". [Agner Fog's listing of instruction latencies](https://www.agner.org/o
 lists Intel Skylake's `DIV` instruction operating on two 64 bit registers having
 a latency of 35-88 cycles, compared to `ADD` instruction operating on the same
 two 64 bit registers having a latency of 1 cycle.
+
+To show how much faster using a bitmask vs. using vision, we measure executing
+1M modulo operations, versus executing 1M bitmasks.
+
+```
+$ bazel run -c opt //examples:power-of-two
+Executing tests from //examples:power-of-two
+-----------------------------------------------------------------------------
+2019-08-13 02:24:03
+Run on (4 X 2800 MHz CPU s)
+CPU Caches:
+  L1 Data 32K (x2)
+  L1 Instruction 32K (x2)
+  L2 Unified 262K (x2)
+  L3 Unified 4194K (x1)
+--------------------------------------------------------
+Benchmark                 Time           CPU Iterations
+--------------------------------------------------------
+BM_Mod                 9261 us       9234 us         75
+BM_BitMask              325 us        324 us       1984
+```
+
+## Lock Striping
+
+Locks can be used for mutual exclusion when you want to have multiple threads
+access shared data exclusively. The downside though is if the shared data is
+frequently accessed and the critical section is non-trivial, your threads could
+spend most of their time contending on the lock, instead of actually doing work.
+
+One solution is *lock striping* by chunking up the data and then using different
+locks for different chunks of data.
+
+To show the perf improvement, we measure a single lock hash set againsta lock
+striped hash set with varying number of chunks inserting 1M items.
+
+```
+$ bazel run -c opt //examples:lock-striping
+Executing tests from //examples:lock-striping
+-----------------------------------------------------------------------------
+2019-08-24 22:24:37
+Run on (4 X 2800 MHz CPU s)
+CPU Caches:
+  L1 Data 32K (x2)
+  L1 Instruction 32K (x2)
+  L2 Unified 262K (x2)
+  L3 Unified 4194K (x1)
+--------------------------------------------------------------------------
+Benchmark                                   Time           CPU Iterations
+--------------------------------------------------------------------------
+BM_SingleLock/threads:1                    65 ms         65 ms         11
+BM_SingleLock/threads:2                   140 ms        254 ms          2
+BM_SingleLock/threads:3                   140 ms        332 ms          3
+BM_SingleLock/threads:4                   142 ms        405 ms          4
+BM_LockStriping_4_Chunks/threads:1         71 ms         69 ms          9
+BM_LockStriping_4_Chunks/threads:2         90 ms        178 ms          4
+BM_LockStriping_4_Chunks/threads:3         89 ms        248 ms          3
+BM_LockStriping_4_Chunks/threads:4         82 ms        299 ms          4
+BM_LockStriping_8_Chunks/threads:1         70 ms         69 ms         10
+BM_LockStriping_8_Chunks/threads:2         74 ms        143 ms          4
+BM_LockStriping_8_Chunks/threads:3         71 ms        198 ms          3
+BM_LockStriping_8_Chunks/threads:4         60 ms        200 ms          4
+```
