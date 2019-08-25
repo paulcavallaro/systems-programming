@@ -1,3 +1,4 @@
+#include <iostream>
 #include <thread>
 
 #include "absl/random/random.h"
@@ -22,8 +23,9 @@ uint64 randomNonPowerOfTwo() {
 
 uint64 randomPowerOfTwo() {
   static auto gen = absl::BitGen();
-  uint64 n = gen();
-  return uint64{1} << flsll(n);
+  const uint64 n = gen();
+  const uint64 shift = n % 63;
+  return uint64{2} << shift;
 }
 
 uint64 getNum() {
@@ -46,10 +48,22 @@ void BM_Mod(benchmark::State& state) {
 void BM_BitMask(benchmark::State& state) {
   uint64 num = getNum();
   uint64 divisor = randomPowerOfTwo();
-  uint64 mask = divisor & (divisor - 1);
+  uint64 mask = divisor - 1;
   for (auto _ : state) {
     for (uint64 i = 0; i < kNumIters; i++) {
       uint64 res = num & mask;
+      benchmark::DoNotOptimize(res);
+    }
+  }
+}
+
+void BM_RightShift(benchmark::State& state) {
+  uint64 num = getNum();
+  uint64 divisor = randomPowerOfTwo();
+  uint64 shift = __builtin_clzll(divisor) + 1;
+  for (auto _ : state) {
+    for (uint64 i = 0; i < kNumIters; i++) {
+      uint64 res = num >> shift;
       benchmark::DoNotOptimize(res);
     }
   }
@@ -87,6 +101,7 @@ void BM_DivideBy3(benchmark::State& state) {
 
 BENCHMARK(BM_Mod)->Unit(benchmark::kMicrosecond);
 BENCHMARK(BM_BitMask)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_RightShift)->Unit(benchmark::kMicrosecond);
 BENCHMARK(BM_RightShiftBy1)->Unit(benchmark::kMicrosecond);
 BENCHMARK(BM_DivideBy2)->Unit(benchmark::kMicrosecond);
 BENCHMARK(BM_DivideBy3)->Unit(benchmark::kMicrosecond);
