@@ -27,6 +27,24 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "circular-buffer",
+    srcs = ["circular-buffer.h"],
+    tags = [],
+    deps = [
+    ],
+)
+
+cc_test(
+    name = "circular-buffer-test",
+    srcs = ["circular-buffer-test.cc"],
+    tags = ["benchmark"],
+    deps = [
+      ":circular-buffer",
+      "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
 cc_test(
     name = "power-of-two",
     srcs = ["power-of-two.cc"],
