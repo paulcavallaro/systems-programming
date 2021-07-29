@@ -8,8 +8,8 @@ namespace {
 void BM_CircularBuffer(benchmark::State& state) {
   CircularBuffer<int> buffer(1024);
   for (auto _ : state) {
-    buffer.Push(0);
-    benchmark::DoNotOptimize(buffer.Pop());
+    buffer.push_back(0);
+    benchmark::DoNotOptimize(buffer.pop_front());
   }
 }
 
