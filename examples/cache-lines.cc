@@ -65,7 +65,7 @@ void BM_NormalCounters(benchmark::State& state) {
   *counter = 0;
   for (auto _ : state) {
     for (int64 i = 0; i < kNumIncrements; i++) {
-      (*counter)++;
+      counter->fetch_add(1, std::memory_order_relaxed);
     }
   }
   benchmark::DoNotOptimize(*counter);
@@ -78,7 +78,7 @@ void BM_CacheLineAwareCounters(benchmark::State& state) {
   *counter = 0;
   for (auto _ : state) {
     for (int64 i = 0; i < kNumIncrements; i++) {
-      (*counter)++;
+      counter->fetch_add(1, std::memory_order_relaxed);
     }
   }
   benchmark::DoNotOptimize(*counter);
