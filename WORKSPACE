@@ -1,12 +1,11 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Abseil archive, presumbly I should be "living at head" even more and update
-# this often.
+# Abseil LTS archive version 20210324.2
 http_archive(
   name = "com_google_absl",
-  urls = ["https://github.com/abseil/abseil-cpp/archive/4ef574064e75b86f115549e9eb4c7e806781b3ab.zip"],
-  strip_prefix = "abseil-cpp-4ef574064e75b86f115549e9eb4c7e806781b3ab",
-  sha256 = "13d7a01eb5452f268b0b2f9d35bf8a51b194cf9d4a5c3c32c0701141bf56bd76",
+  urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20210324.2.zip"],
+  strip_prefix = "abseil-cpp-20210324.2",
+  sha256 = "1a7edda1ff56967e33bc938a4f0a68bb9efc6ba73d62bb4a5f5662463698056c",
 )
 
 # glog archive.
