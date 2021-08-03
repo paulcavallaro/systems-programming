@@ -1,9 +1,10 @@
 cc_binary(
   name = "hello-world",
+  srcs = ["hello-world.cc"],
   deps = [
     "@com_google_absl//absl/strings",
+    "@com_github_google_glog//:glog",
   ],
-  srcs = ["hello-world.cc"],
 )
 
 cc_test(
